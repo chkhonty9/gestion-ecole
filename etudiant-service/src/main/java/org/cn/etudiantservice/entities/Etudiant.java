@@ -1,8 +1,9 @@
 package org.cn.etudiantservice.entities;
 
-import jakarta.persistence.*;
 import lombok.*;
 import org.cn.etudiantservice.dto.Filiere;
+
+import javax.persistence.*;
 
 @Entity
 @Data @AllArgsConstructor @NoArgsConstructor

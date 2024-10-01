@@ -1,6 +1,6 @@
 package org.cn.filiereservice.entities;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 @Entity
