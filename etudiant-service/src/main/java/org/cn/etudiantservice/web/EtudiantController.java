@@ -33,7 +33,9 @@ public class EtudiantController {
     @PostMapping
     public ResponseEntity<EtudiantDTO> save(@RequestBody EtudiantDTO etudiantDTO) {
         System.out.println("************* controller : save etudiant *************");
-        return ResponseEntity.ok(etudiantService.save(etudiantDTO));
+        EtudiantDTO etudiant = etudiantService.save(etudiantDTO);
+        etudiant.setFiliere(filiereRestClient.findFiliereById(etudiant.getIdFiliere()));
+        return ResponseEntity.ok(etudiant);
     }
 
     @PutMapping("/{id}")
