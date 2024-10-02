@@ -1,6 +1,6 @@
 package org.cn.etudiantservice.web;
 
-import lombok.AllArgsConstructor;
+import org.cn.etudiantservice.clients.FiliereRestClient;
 import org.cn.etudiantservice.dto.EtudiantDTO;
 import org.cn.etudiantservice.service.EtudiantService;
 import org.springframework.http.ResponseEntity;
@@ -10,15 +10,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/etudiants")
-@AllArgsConstructor
 public class EtudiantController {
 
     private final EtudiantService etudiantService;
+    private final FiliereRestClient filiereRestClient;
+
+    public EtudiantController(EtudiantService etudiantService, FiliereRestClient filiereRestClient) {
+        this.etudiantService = etudiantService;
+        this.filiereRestClient = filiereRestClient;
+    }
 
     @GetMapping
     public ResponseEntity<List<EtudiantDTO>> getAllEtudiants() {
         System.out.println("************* controller : getAll etudiants *************");
-        return ResponseEntity.ok(etudiantService.findAll());
+        List<EtudiantDTO> etudiants = etudiantService.findAll();
+        etudiants.forEach(e ->{
+            e.setFiliere(filiereRestClient.findFiliereById(e.getIdFiliere()));
+        });
+        return ResponseEntity.ok(etudiants);
     }
 
     @PostMapping
@@ -33,19 +42,25 @@ public class EtudiantController {
         if(etudiantService.findOne(id) == null)
             return ResponseEntity.notFound().build();
         etudiantDTO.setId(id);
-        return ResponseEntity.ok(etudiantService.save(etudiantDTO));
+        etudiantDTO = etudiantService.save(etudiantDTO);
+        etudiantDTO.setFiliere(filiereRestClient.findFiliereById(etudiantDTO.getIdFiliere()));
+        return ResponseEntity.ok(etudiantDTO);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EtudiantDTO> findOne(@PathVariable Long id) {
         System.out.println("************* controller : find by id etudiant *************");
-        return ResponseEntity.ok(etudiantService.findOne(id));
+        EtudiantDTO etudiant = etudiantService.findOne(id);
+        etudiant.setFiliere(filiereRestClient.findFiliereById(etudiant.getIdFiliere()));
+        return ResponseEntity.ok(etudiant);
     }
 
     @GetMapping("/cne/{cne}")
     public ResponseEntity<EtudiantDTO> findByCne(@PathVariable String cne) {
         System.out.println("************* controller : find by cne etudiant *************");
-        return ResponseEntity.ok(etudiantService.findByCne(cne));
+        EtudiantDTO etudiant = etudiantService.findByCne(cne);
+        etudiant.setFiliere(filiereRestClient.findFiliereById(etudiant.getIdFiliere()));
+        return ResponseEntity.ok(etudiant);
     }
 
     @DeleteMapping("/{id}")
